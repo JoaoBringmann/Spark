@@ -4,6 +4,12 @@ Treinando Apache Spark
 
 # Comandos
 
+## Rodar Spark
+
+```bash
+cd Exercicio
+```
+
 ```bash
 docker-compose up --build
 ```
@@ -16,8 +22,35 @@ docker cp .\SCRIPT.py spark-master:/opt/spark/SCRIPT.py
 docker exec -it spark-master /opt/spark/bin/spark-submit /opt/spark/SCRIPT.py
 ```
 
+## Comandos Spark
 
-## O que é Spark
+`.filter()`
+
+`.select()`
+
+`.join()`
+
+`.withColumn()`
+
+`.drop()`
+
+`.show()`
+
+`.count()`
+
+`.collect()`
+
+`write.parquet()`
+
+`.groupBy()`
+
+`.orderBy()`
+
+`.distinct()`
+
+`.join()`
+
+# O que é Spark
 
 O Apache Spark é uma ferramenta de processamento de dados de forma paralela, ele não armazena dados, nem é o destino final destes dados ele é quem faz a transformação deles
 
@@ -42,7 +75,6 @@ O Spark por natureza não realiza nenhuma operação a não ser que seja explici
 Então as transformações constroem o Manual e as Ações realizam os passos deste Manual
 
 # Perguntas
-
 
 1. O Apache Spark foi projetado para substituir bancos de dados de armazenamento como o Hadoop HDFS ou ele desempenha outro papel? Explique.
    R:**Ele não foi feito para ser utilizado como BD mas sim como uma ferramenta de processamento de dados em paralelo**
