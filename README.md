@@ -121,13 +121,19 @@ CSV: O formato mais simples, baseado em texto puro. Salva os dados como uma tabe
 
 JSON: Formato baseado em texto que organiza os dados em pares de "chave-valor" e listas, usando chaves { } e colchetes [ ]
 
-Parquet: Formato colunar e binario, melhor formato para Spark, reduz o tamanho em até 75% pois os dados de cada tipo ficam juntos, Filtro de Fonte é algo que é possivel com o formato Parquet que é fazer um filtro de comparar a idade, buscar os dados de INT e pular qualquer outro que não for INT 
+Parquet: Formato colunar e binario, melhor formato para Spark, reduz o tamanho em até 75% pois os dados de cada tipo ficam juntos, Filtro de Fonte é algo que é possivel com o formato Parquet que é fazer um filtro de comparar a idade, buscar os dados de INT e pular qualquer outro que não for INT
 
 ##### Particionamento de Dados
 
 Para Otimizar ainda mais a busca dos dados é feito a divisão dos arquivos em subpastas estruturadas com base no valor de uma ou mais colunas, para evitar procurar em milhares de arquivos parquet, ou seja se vc instruir o spark a procurar por mes e ano ele vai isolar os arquivos que estão nestas datas e se alguem requerir dados do mes 3 todos os outros serão ignorados
 
 **Problema:** Se for instruido ao Spark particionar os Cpf ele criara 1 arquivo para cada CPF pois ele é um dado unico, isso causaria o Over-Paticioning
+
+##### Data Skew
+
+**Problema**: Imagine que temos uma chave que divide dados por estado, este dados compoem 400 mil linhas, ao processar em 4 workers em vez de distribuir 100 mil linhas para cada ele dividira por chave unica então se os dados de 3 estados são enviados a cada worker mas 1 destes estados compoem 30 mil linhas, ocorrera uma lentidão imensa pois mesmo que os outros 3 workers acabem o trabalho rapido eles não enviaram o resultado até o quarto worker funcionar o que levara muito tempo
+
+**Solução**: É feito um broadcast Join para tabelas pequenas, mas as grandes é feito um salting, onde vc modifica a chave daquele estado para ter um numero a mais e assim cada worker receber uma parte dos dados deste estado sem causar 1 worker a trabalhar sozinho
 
 # Perguntas
 
@@ -179,7 +185,7 @@ Você recebeu a missão de criar um pipeline no Spark que lê uma tabela histór
 21. Explique por que o conceito de "desacoplamento de armazenamento e processamento" (usar Spark com AWS S3/Cloud Storage em vez de servidores locais com HDFS) é o padrão mais adotado por grandes empresas hoje em dia.
     R:**No modelo antigo (HDFS tradicional), se você precisasse de mais espaço de armazenamento, era obrigado a comprar mais servidores inteiros (com CPU, RAM e Disco), mesmo que não precisasse de mais poder de processamento. Desacoplando (Spark rodando em instâncias efêmeras e dados no S3/GCS), você desliga o cluster Spark à noite ou quando os pipelines terminarem (pagando zero por CPU/RAM nessas horas) e seus dados continuam guardados de forma segura e barata na nuvem**
 
-FIM CENÁRIO
+**FIM CENÁRIO**
 
 22. Pensando no cenário real da sua empresa ou de grandes volumes de dados: Se você tiver uma tabela com dados coletados a cada segundo de sensores de aeronaves e navios, qual seria uma boa estratégia de coluna de partição para salvar esses dados no Data Lake sem causar  *Over-partitioning* ?
     R:**Pensando neste caso uma ideia obvia seria dividir o tipo de transporte que dividiria aeronaves de navios**
